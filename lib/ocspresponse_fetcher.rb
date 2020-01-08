@@ -28,18 +28,12 @@ using OCSPResponseFetcher::Refinements
 
 class OCSPResponseFetcher
   class << self
-    def read_local_file
-      return nil unless File.exist?('/tmp/ocsp_response.der')
-
-      der = File.binread('/tmp/ocsp_response.der')
-      ocsp_response = OpenSSL::OCSP::Response.new(der)
-      return nil if ocsp_response.basic.status.first[5] < Time.now
-
-      ocsp_response
-    end
-
-    def write_local_file(ocsp_response)
-      File.binwrite('/tmp/ocsp_response.der', ocsp_response.to_der)
+    def write_stdout(ocsp_response)
+      puts ocsp_response.to_der
+                        .unpack1('H*')
+                        .scan(/.{1,2}/)
+                        .map { |hex| '\x' + hex }
+                        .join
     end
   end
 
@@ -52,9 +46,8 @@ class OCSPResponseFetcher
   #
   # @raise [RuntimeError]
   # rubocop: disable Metrics/ParameterLists
-  def initialize(ee_cert, interm_cert, ca_cert = nil,
-                 read_cache = OCSPResponseFetcher.method(:read_local_file),
-                 write_cache = OCSPResponseFetcher.method(:write_local_file),
+  def initialize(ee_cert, interm_cert, ca_cert = nil, read_cache = nil,
+                 write_cache = OCSPResponseFetcher.method(:write_stdout),
                  logger = Logger.new(STDERR))
     store = OpenSSL::X509::Store.new
     store.set_default_paths
