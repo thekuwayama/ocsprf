@@ -44,7 +44,6 @@ class OCSPResponseFetcher
   # @param logger [Logger]
   #
   # @raise [RuntimeError]
-  # rubocop: disable Metrics/ParameterLists
   def initialize(ee_cert, inter_cert, read_cache: nil,
                  write_cache: OCSPResponseFetcher.method(:write_stdout),
                  logger: Logger.new(STDERR))
@@ -57,17 +56,16 @@ class OCSPResponseFetcher
     @write_cache = write_cache
     @logger = logger
   end
-  # rubocop: enable Metrics/ParameterLists
 
   def run
-    ocsp_response = @read_cache&.call
+    read = ocsp_response = @read_cache&.call
     if ocsp_response.nil?
       @logger.warn('cache miss')
       ocsp_response = request_and_validate(@cid, @ocsp_uri)
     end
 
     begin
-      @write_cache&.call(ocsp_response) unless ocsp_response.nil?
+      @write_cache&.call(ocsp_response) if !ocsp_response.nil? && read.nil?
     rescue StandardError => e
       @logger.warn(e)
     end
