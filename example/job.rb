@@ -27,13 +27,13 @@ def parse_options(argv = ARGV)
 end
 
 def fetch
-  ee, interm = parse_options
+  ee, inter = parse_options
   fetcher = OCSPResponseFetcher.new(
     OpenSSL::X509::Certificate.new(File.read(ee)),
-    OpenSSL::X509::Certificate.new(File.read(interm))
+    OpenSSL::X509::Certificate.new(File.read(inter))
   )
   fetcher.run
 end
 
 fetch
-# $ bundle exec ruby example/job.rb tmp/ee.pem tmp/interm.pem
+# $ bundle exec ruby example/job.rb tmp/ee.pem tmp/inter.pem

@@ -5,24 +5,26 @@ require 'timeout'
 require 'net/http'
 require 'logger'
 
-module Refinements
-  refine OpenSSL::X509::Certificate do
-    unless method_defined?(:ocsp_uris)
-      define_method(:ocsp_uris) do
-        aia = extensions.find { |ex| ex.oid == 'authorityInfoAccess' }
-        return nil if aia.nil?
+class OCSPResponseFetcher
+  module Refinements
+    refine OpenSSL::X509::Certificate do
+      unless method_defined?(:ocsp_uris)
+        define_method(:ocsp_uris) do
+          aia = extensions.find { |ex| ex.oid == 'authorityInfoAccess' }
+          return nil if aia.nil?
 
-        ostr = OpenSSL::ASN1.decode(aia.to_der).value.last
-        ocsp = OpenSSL::ASN1.decode(ostr.value)
-                            .map(&:value)
-                            .select { |des| des.first.value == 'OCSP' }
-        ocsp&.map { |o| o[1].value }
+          ostr = OpenSSL::ASN1.decode(aia.to_der).value.last
+          ocsp = OpenSSL::ASN1.decode(ostr.value)
+                              .map(&:value)
+                              .select { |des| des.first.value == 'OCSP' }
+          ocsp&.map { |o| o[1].value }
+        end
       end
     end
   end
 end
 
-using Refinements
+using OCSPResponseFetcher::Refinements
 
 class OCSPResponseFetcher
   class << self
@@ -49,6 +51,7 @@ class OCSPResponseFetcher
   # @param logger [Logger]
   #
   # @raise [RuntimeError]
+  # rubocop: disable Metrics/ParameterLists
   def initialize(ee_cert, interm_cert, ca_cert = nil,
                  read_cache = OCSPResponseFetcher.method(:read_local_file),
                  write_cache = OCSPResponseFetcher.method(:write_local_file),
@@ -73,6 +76,7 @@ class OCSPResponseFetcher
     @write_cache = write_cache
     @logger = logger
   end
+  # rubocop: enable Metrics/ParameterLists
 
   def run
     ocsp_response = @read_cache&.call
