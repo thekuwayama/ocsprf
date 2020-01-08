@@ -46,9 +46,9 @@ class OCSPResponseFetcher
   #
   # @raise [RuntimeError]
   # rubocop: disable Metrics/ParameterLists
-  def initialize(ee_cert, interm_cert, ca_cert = nil, read_cache = nil,
-                 write_cache = OCSPResponseFetcher.method(:write_stdout),
-                 logger = Logger.new(STDERR))
+  def initialize(ee_cert, interm_cert, ca_cert: nil, read_cache: nil,
+                 write_cache: OCSPResponseFetcher.method(:write_stdout),
+                 logger: Logger.new(STDERR))
     store = OpenSSL::X509::Store.new
     store.set_default_paths
     store.add_cert(ca_cert) unless ca_cert.nil?
@@ -68,7 +68,6 @@ class OCSPResponseFetcher
     @read_cache = read_cache
     @write_cache = write_cache
     @logger = logger
-    @logger.progname = "OCSPResponse Fetcher #{ee_cert.subject}"
   end
   # rubocop: enable Metrics/ParameterLists
 
