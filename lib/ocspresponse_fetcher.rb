@@ -38,29 +38,17 @@ class OCSPResponseFetcher
   end
 
   # @param ee_cert [OpenSSL::X509::Certificate]
-  # @param interm_cert [OpenSSL::X509::Certificate]
-  # @param ca_cert [OpenSSL::X509::Certificate]
+  # @param inter_cert [OpenSSL::X509::Certificate]
   # @param read_cache [Proc] Proc that returns OpenSSL::OCSP::Request
   # @param write_cache [Proc] Proc that receives OpenSSL::OCSP::Request
   # @param logger [Logger]
   #
   # @raise [RuntimeError]
   # rubocop: disable Metrics/ParameterLists
-  def initialize(ee_cert, interm_cert, ca_cert: nil, read_cache: nil,
+  def initialize(ee_cert, inter_cert, read_cache: nil,
                  write_cache: OCSPResponseFetcher.method(:write_stdout),
                  logger: Logger.new(STDERR))
-    store = OpenSSL::X509::Store.new
-    store.set_default_paths
-    store.add_cert(ca_cert) unless ca_cert.nil?
-    context = OpenSSL::X509::StoreContext.new(
-      store,
-      ee_cert,
-      [interm_cert]
-    )
-    raise 'OpenSSL::X509::StoreContext#verify failed' \
-      unless context.verify
-
-    @cid = OpenSSL::OCSP::CertificateId.new(ee_cert, context.chain[1])
+    @cid = OpenSSL::OCSP::CertificateId.new(ee_cert, inter_cert)
     @ocsp_uri = ee_cert.ocsp_uris
                       &.find { |u| URI::DEFAULT_PARSER.make_regexp =~ u }
     raise 'OpenSSL::X509::Certificate#ocsp_uris failed' if @ocsp_uri.nil?
