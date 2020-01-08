@@ -68,7 +68,7 @@ class OCSPResponseFetcher
     @read_cache = read_cache
     @write_cache = write_cache
     @logger = logger
-    @logger.progname = "OCSPResponse Fetcher #{ee_cert.subject.to_s}"
+    @logger.progname = "OCSPResponse Fetcher #{ee_cert.subject}"
   end
   # rubocop: enable Metrics/ParameterLists
 
