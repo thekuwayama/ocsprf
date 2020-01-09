@@ -5,7 +5,7 @@ require 'timeout'
 require 'net/http'
 require 'logger'
 
-class OCSPResponseFetcher
+class OCSPResponseFetch
   module Refinements
     refine OpenSSL::X509::Certificate do
       unless method_defined?(:ocsp_uris)
@@ -24,9 +24,9 @@ class OCSPResponseFetcher
   end
 end
 
-using OCSPResponseFetcher::Refinements
+using OCSPResponseFetch::Refinements
 
-class OCSPResponseFetcher
+class OCSPResponseFetch
   class << self
     def write_stdout(ocsp_response)
       puts ocsp_response.to_der
@@ -45,7 +45,7 @@ class OCSPResponseFetcher
   #
   # @raise [RuntimeError]
   def initialize(ee_cert, inter_cert, read_cache: nil,
-                 write_cache: OCSPResponseFetcher.method(:write_stdout),
+                 write_cache: OCSPResponseFetch.method(:write_stdout),
                  logger: Logger.new(STDERR))
     @cid = OpenSSL::OCSP::CertificateId.new(ee_cert, inter_cert)
     @ocsp_uri = ee_cert.ocsp_uris

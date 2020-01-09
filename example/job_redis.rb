@@ -37,7 +37,7 @@ rescue StandardError
   return nil
 end
 
-fetcher = OCSPResponseFetcher.new(
+fetcher = OCSPResponseFetch.new(
   ee_cert,
   inter_cert,
   read_cache: read_redis,

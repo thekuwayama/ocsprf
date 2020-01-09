@@ -26,7 +26,7 @@ write_local_file = lambda do |ocsp_response|
   File.binwrite(CACHE_FILE_PATH, ocsp_response.to_der)
 end
 
-fetcher = OCSPResponseFetcher.new(
+fetcher = OCSPResponseFetch.new(
   ee_cert,
   inter_cert,
   read_cache: read_local_file,

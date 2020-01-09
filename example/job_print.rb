@@ -10,7 +10,7 @@ key = ee_cert.subject.to_s + ' ' \
 logger = Logger.new(STDERR)
 logger.progname = "OCSPResponse Fetcher #{key}"
 
-fetcher = OCSPResponseFetcher.new(
+fetcher = OCSPResponseFetch.new(
   ee_cert,
   inter_cert,
   logger: logger

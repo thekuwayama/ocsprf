@@ -3,7 +3,7 @@
 $LOAD_PATH << __dir__ + '/../lib'
 
 require 'optparse'
-require 'ocspresponse_fetcher'
+require 'ocsprf'
 
 def parse_options(argv = ARGV)
   op = OptionParser.new
