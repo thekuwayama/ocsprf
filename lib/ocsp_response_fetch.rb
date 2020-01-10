@@ -58,14 +58,18 @@ class OCSPResponseFetch
   end
 
   def run
-    read = ocsp_response = @read_cache&.call
-    if ocsp_response.nil?
+    ocsp_response = @read_cache&.call
+    fresh = true
+
+    if ocsp_response.nil? ||
+       ocsp_response.basic.status.none? { |s| s.first.cmp(@cid) }
       @logger.warn('cache miss')
       ocsp_response = request_and_validate(@cid, @ocsp_uri)
+      fresh = false
     end
 
     begin
-      @write_cache&.call(ocsp_response) if !ocsp_response.nil? && read.nil?
+      @write_cache&.call(ocsp_response) if !ocsp_response.nil? && !fresh
     rescue StandardError => e
       @logger.warn(e)
     end
@@ -86,14 +90,14 @@ class OCSPResponseFetch
       return nil
     end
 
-    check_nonce = ocsp_request.check_nonce(ocsp_response.basic)
-    unless [-1, 1].include?(check_nonce)
-      @logger.warn("OCSPResponse's nonce is invalid")
+    if ocsp_response.status != OpenSSL::OCSP::RESPONSE_STATUS_SUCCESSFUL
+      @logger.warn("OCSPResponse's status is NOT success")
       return nil
     end
 
-    if ocsp_response.status != OpenSSL::OCSP::RESPONSE_STATUS_SUCCESSFUL
-      @logger.warn("OCSPResponse's status is NOT success")
+    check_nonce = ocsp_request.check_nonce(ocsp_response.basic)
+    unless [-1, 1].include?(check_nonce)
+      @logger.warn("OCSPResponse's nonce is invalid")
       return nil
     end
 
