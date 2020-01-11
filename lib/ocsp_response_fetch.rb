@@ -47,6 +47,7 @@ class OCSPResponseFetch
   def initialize(ee_cert, inter_cert, read_cache: nil,
                  write_cache: OCSPResponseFetch.method(:write_stdout),
                  logger: Logger.new(STDERR))
+    @certs_chain = [ee_cert, inter_cert]
     @cid = OpenSSL::OCSP::CertificateId.new(ee_cert, inter_cert)
     @ocsp_uri = ee_cert.ocsp_uris
                       &.find { |u| URI::DEFAULT_PARSER.make_regexp =~ u }
@@ -64,7 +65,7 @@ class OCSPResponseFetch
     if ocsp_response.nil? ||
        ocsp_response.basic.status.none? { |s| s.first.cmp(@cid) }
       @logger.warn('cache miss')
-      ocsp_response = request_and_validate(@cid, @ocsp_uri)
+      ocsp_response = request_and_validate(@cid, @ocsp_uri, @certs_chain)
       fresh = false
     end
 
@@ -78,7 +79,7 @@ class OCSPResponseFetch
   private
 
   # @return [OpenSSL::OCSP::Response, nil]
-  def request_and_validate(cid, ocsp_uri)
+  def request_and_validate(cid, ocsp_uri, certs)
     ocsp_request = gen_ocsp_request(cid)
     ocsp_response = nil
     begin
@@ -98,6 +99,12 @@ class OCSPResponseFetch
     check_nonce = ocsp_request.check_nonce(ocsp_response.basic)
     unless [-1, 1].include?(check_nonce)
       @logger.warn("OCSPResponse's nonce is invalid")
+      return nil
+    end
+
+    store = OpenSSL::X509::Store.new.set_default_paths
+    unless ocsp_response.basic.verify(certs, store)
+      @logger.warn("OCSPResponse's signature is invalid")
       return nil
     end
 
