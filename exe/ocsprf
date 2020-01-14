@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+$LOAD_PATH << __dir__ + '/../lib'
+
+require 'ocsp_response_fetch'
+
+OCSPResponseFetch::CLI.new.run
