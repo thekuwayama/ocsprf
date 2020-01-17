@@ -37,7 +37,7 @@ RSpec.describe OCSPResponseFetch::Fetcher do
       OpenSSL::OCSP::RESPONSE_STATUS_SUCCESSFUL,
       OpenSSL::OCSP::V_CERTSTATUS_GOOD,
       Time.now + (60 * 60 * 24 * 365 * 10),
-      Time.new,
+      Time.now,
       Time.now + (60 * 60 * 24 * 14),
       []
     )
