@@ -76,6 +76,11 @@ module OCSPResponseFetch
       if inter.nil? || inter.empty?
         ca_issuer = ee_cert.ca_issuer_uris
                           &.find { |u| URI::DEFAULT_PARSER.make_regexp =~ u }
+        if ca_issuer.nil?
+          raise OCSPResponseFetch::Error::FetchFailedError,
+                'Certificate does not contain Issuer URL'
+        end
+
         inter_cert = get_inter_cert(ca_issuer)
       else
         inter_cert = OpenSSL::X509::Certificate.new(File.read(inter))

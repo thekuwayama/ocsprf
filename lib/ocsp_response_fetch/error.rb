@@ -7,7 +7,5 @@ module OCSPResponseFetch
 
     class RevokedError < Error; end
     class FetchFailedError < Error; end
-    class FileAccessError < Error; end
-    class RedisAccessError < Error; end
   end
 end

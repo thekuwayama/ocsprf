@@ -13,7 +13,10 @@ module OCSPResponseFetch
       @cid = OpenSSL::OCSP::CertificateId.new(ee_cert, inter_cert)
       @ocsp_uri = ee_cert.ocsp_uris
                         &.find { |u| URI::DEFAULT_PARSER.make_regexp =~ u }
-      raise 'OpenSSL::X509::Certificate#ocsp_uris failed' if @ocsp_uri.nil?
+      return unless @ocsp_uri.nil?
+
+      raise OCSPResponseFetch::Error::FetchFailedError,
+            'Certificate does not contain OCSP URL'
     end
 
     def run
@@ -37,8 +40,9 @@ module OCSPResponseFetch
         Timeout.timeout(2) do
           ocsp_response = send_ocsp_request(ocsp_request, ocsp_uri)
         end
-      rescue Timeout::Error => e
-        raise OCSPResponseFetch::Error::Error, e.inspect
+      rescue Timeout::Error
+        raise OCSPResponseFetch::Error::FetchFailedError,
+              'Timeout to access OCSP Responder'
       end
 
       if ocsp_response&.status != OpenSSL::OCSP::RESPONSE_STATUS_SUCCESSFUL
