@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'logger'
 require 'net/http'
 require 'openssl'
 require 'optparse'

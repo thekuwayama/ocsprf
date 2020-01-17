@@ -2,11 +2,8 @@
 
 source 'https://rubygems.org'
 
-gem 'logger'
 gem 'openssl'
 gem 'rake'
-gem 'redis'
-gem 'thor'
 
 group :test do
   gem 'pry'
