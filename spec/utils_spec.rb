@@ -50,7 +50,7 @@ RSpec.describe OCSPResponseFetch::Refinements do
     end
 
     let(:nextupd) do
-      Time.now + (60 * 60 * 24 * 14)
+      Time.now + (60 * 60 * 24 * 7)
     end
 
     let(:ocsp_response) do
