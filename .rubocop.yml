@@ -18,3 +18,7 @@ Metrics/MethodLength:
 
 Naming/MethodParameterName:
   MinNameLength: 1
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/*.rb'

@@ -39,16 +39,16 @@ module OCSPResponseFetch
         basic.responses.map do |res|
           <<~"OCSP_RESPONSE"
             OCSP Response Data:
-                OCSP Response Status: "#{format('0x%02<status>x', status: status)}"
+                OCSP Response Status: (#{format('0x%<status>x', status: status)})
                 Responses:
                 Certificate ID:
-                  Hash Algorithm: "#{res.certid.hash_algorithm}"
-                  Issuer Name Hash: "#{res.certid.issuer_name_hash.upcase}"
-                  Issuer Key Hash: "#{res.certid.issuer_key_hash.upcase}"
-                  Serial Number: "#{res.certid.serial.to_s(16)}"
-                Cert Status: "#{cert_status[res.cert_status]}"
-                This Update: "#{res.this_update}"
-                Next Update: "#{res.next_update}"
+                  Hash Algorithm: #{res.certid.hash_algorithm}
+                  Issuer Name Hash: #{res.certid.issuer_name_hash.upcase}
+                  Issuer Key Hash: #{res.certid.issuer_key_hash.upcase}
+                  Serial Number: #{res.certid.serial.to_s(16)}
+                Cert Status: #{cert_status[res.cert_status]}
+                This Update: #{res.this_update}
+                Next Update: #{res.next_update}
           OCSP_RESPONSE
         end.join
       end

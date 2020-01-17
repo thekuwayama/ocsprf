@@ -5,4 +5,4 @@ $LOAD_PATH << __dir__ + '/../lib'
 
 require 'ocsp_response_fetch'
 
-OCSPResponseFetch::CLI.new.run
+OCSPResponseFetch::CLI.run
