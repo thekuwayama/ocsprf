@@ -38,7 +38,7 @@ RSpec.describe OCSPResponseFetch::Fetcher do
       OpenSSL::OCSP::V_CERTSTATUS_GOOD,
       Time.now + (60 * 60 * 24 * 365 * 10),
       Time.now,
-      Time.now + (60 * 60 * 24 * 14),
+      Time.now + (60 * 60 * 24 * 7),
       []
     )
     bres.add_nonce(nonce)
