@@ -95,6 +95,12 @@ module OCSPResponseFetch
       # rubocop: enable Metrics/AbcSize
       # rubocop: enable Metrics/MethodLength
 
+      # @param subject [String]
+      # @param issuer [String]
+      #
+      # @raise [OCSPResponseFetch::Error::Error]
+      #
+      # @return [Array of OpenSSL::X509::Certificate]
       def read_certs(subject, issuer = nil)
         subject_cert = OpenSSL::X509::Certificate.new(File.read(subject))
         issuer_cert = nil
@@ -124,12 +130,18 @@ module OCSPResponseFetch
         [subject_cert, issuer_cert]
       end
 
+      # @param uri_string [String]
+      #
+      # @return [OpenSSL::X509::Certificate]
       def get_issuer_cert(uri_string)
         OpenSSL::X509::Certificate.new(
           send_http_get(uri_string)
         )
       end
 
+      # @param uri_string [String]
+      #
+      # @return [String]
       def send_http_get(uri_string)
         uri = URI.parse(uri_string)
         path = uri.path
