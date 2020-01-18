@@ -19,12 +19,21 @@ module OCSPResponseFetch
             'Certificate does not contain OCSP URL'
     end
 
+    # @raise [OCSPResponseFetch::Error::Error]
+    #
+    # @return [OpenSSL::OCSP::Response]
     def run
       Fetcher.request_and_validate(@cid, @ocsp_uri, @certs_chain)
     end
 
     class << self
-      # @return [OpenSSL::OCSP::Response, nil]
+      # @param cid [OpenSSL::OCSP::CertificateId]
+      # @param ocsp_uri [String]
+      # @param certs [Array of OpenSSL::X509::Certificate]
+      #
+      # @raise [OCSPResponseFetch::Error::Error]
+      #
+      # @return [OpenSSL::OCSP::Response]
       # rubocop: disable Metrics/CyclomaticComplexity
       # rubocop: disable Metrics/MethodLength
       # rubocop: disable Metrics/PerceivedComplexity
@@ -73,6 +82,9 @@ module OCSPResponseFetch
       # rubocop: enable Metrics/MethodLength
       # rubocop: enable Metrics/PerceivedComplexity
 
+      # @param cid [OpenSSL::OCSP::CertificateId]
+      #
+      # @return [OpenSSL::OCSP::Request]
       def gen_ocsp_request(cid)
         ocsp_request = OpenSSL::OCSP::Request.new
         ocsp_request.add_certid(cid)
@@ -80,6 +92,10 @@ module OCSPResponseFetch
         ocsp_request
       end
 
+      # @param ocsp_request [OpenSSL::OCSP::Request]
+      # @param uri_string [String]
+      #
+      # @return [OpenSSL::OCSP::Response]
       def send_ocsp_request(ocsp_request, uri_string)
         uri = URI.parse(uri_string)
         path = uri.path

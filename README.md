@@ -1,28 +1,25 @@
 # ocsprf
 
+[![Gem Version](https://badge.fury.io/rb/ocsprf.svg)](https://badge.fury.io/rb/ocsprf)
 [![Actions Status](https://github.com/thekuwayama/ocsprf/workflows/CI/badge.svg)](https://github.com/thekuwayama/ocsprf/actions?workflow=CI)
 [![Maintainability](https://api.codeclimate.com/v1/badges/4d5bb71e2dca46f5a239/maintainability)](https://codeclimate.com/github/thekuwayama/ocsprf/maintainability)
 
 OCSP Response Fetch
 
 
-## Quick Start
+## Installation
+
+The gem is available at [rubygems.org](https://rubygems.org/gems/ocsprf). You can install it the following.
 
 ```bash
-$ git clone git@github.com:thekuwayama/ocsprf.git
-
-$ cd ocsprf
-
-$ bundle install
-
-$ bundle exec exe/ocsprf
+$ gem install ocsprf
 ```
 
 
 ## Usage
 
 ```bash
-$ bundle exec exe/ocsprf --help
+$ ocsprf --help
 Usage: ocsprf [options] PATH
     -i, --issuer PATH                issuer certificate path
     -s, --strict                     strict mode                   (default false)
@@ -32,14 +29,14 @@ Usage: ocsprf [options] PATH
 You can run it the following and print the DER-encoded OCSP Response that fetched.
 
 ```bash
-$ bundle exec exe/ocsprf /path/to/subject/certificate
+$ ocsprf /path/to/subject/certificate
 $DER_BINARY
 ```
 
 If you need to print OCSP Response text, you can run it the following.
 
 ```bash
-$ bundle exec exe/ocsprf /path/to/subject/certificate --verbose > /dev/null
+$ ocsprf /path/to/subject/certificate --verbose > /dev/null
 OCSP Response Data:
     OCSP Response Status: (0x0)
     Responses:
@@ -57,7 +54,7 @@ If you have the issuer certificate corresponding to the subject certificate, you
 By default, `ocsprf` tries to get the issuer certificate using AIA extension.
 
 ```bash
-$ bundle exec exe/ocsprf /path/to/subject/certificate --issuer /path/to/issuer/certificate --verbose > /dev/null
+$ ocsprf /path/to/subject/certificate --issuer /path/to/issuer/certificate --verbose > /dev/null
 OCSP Response Data:
     OCSP Response Status: (0x0)
     Responses:
@@ -74,4 +71,4 @@ OCSP Response Data:
 
 ## License
 
-The CLI is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).

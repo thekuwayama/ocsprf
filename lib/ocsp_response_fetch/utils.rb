@@ -33,6 +33,7 @@ module OCSPResponseFetch
     end
 
     refine OpenSSL::OCSP::Response do
+      # @return [String]
       def to_text
         cert_status = %w[good revoked unknown]
 
