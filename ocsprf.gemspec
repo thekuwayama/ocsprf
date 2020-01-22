@@ -22,5 +22,6 @@ Gem::Specification.new do |spec|
   spec.executables   = ['ocsprf']
 
   spec.add_development_dependency 'bundler'
+  spec.add_dependency             'fileutils'
   spec.add_dependency             'openssl'
 end
