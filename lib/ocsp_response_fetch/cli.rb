@@ -24,19 +24,26 @@ module OCSPResponseFetch
         end
 
         warn ocsp_response.to_text if opts[:verbose]
-        puts ocsp_response.to_der
+        if opts[:output].nil?
+          puts ocsp_response.to_der
+        else
+          File.write(opts[:output], ocsp_response.to_der)
+        end
       end
 
       private
 
       # rubocop: disable Metrics/AbcSize
+      # rubocop: disable Metrics/CyclomaticComplexity
       # rubocop: disable Metrics/MethodLength
+      # rubocop: disable Metrics/PerceivedComplexity
       def parse_options(argv = ARGV)
         op = OptionParser.new
 
         # default value
         opts = {
           issuer: nil,
+          output: nil,
           strict: false,
           verbose: false
         }
@@ -47,6 +54,14 @@ module OCSPResponseFetch
           'issuer certificate path'
         ) do |v|
           opts[:issuer] = v
+        end
+
+        op.on(
+          '-o PATH',
+          '--output PATH',
+          'output file path'
+        ) do |v|
+          opts[:output] = v
         end
 
         op.on(
@@ -90,10 +105,26 @@ module OCSPResponseFetch
           exit 1
         end
 
+        unless opts[:output].nil?
+          begin
+            FileUtils.touch(opts[:output])
+          rescue Errno::EACCES
+            warn "error file #{opts[:output]} is not writable"
+            exit 1
+          end
+
+          unless File.writable?(opts[:output])
+            warn "error file #{opts[:output]} is not writable"
+            exit 1
+          end
+        end
+
         [args[0], opts]
       end
       # rubocop: enable Metrics/AbcSize
+      # rubocop: enable Metrics/CyclomaticComplexity
       # rubocop: enable Metrics/MethodLength
+      # rubocop: enable Metrics/PerceivedComplexity
 
       # @param subject [String]
       # @param issuer [String]
