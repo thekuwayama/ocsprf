@@ -9,10 +9,10 @@ module OCSPResponseFetch
       def run
         subject, opts = parse_options
         issuer = opts[:issuer]
-        subject_cert, issuer_cert = read_certs(subject, issuer)
-
-        fetcher = Fetcher.new(subject_cert, issuer_cert)
+        ocsp_response = nil
         begin
+          subject_cert, issuer_cert = read_certs(subject, issuer)
+          fetcher = Fetcher.new(subject_cert, issuer_cert)
           ocsp_response = fetcher.run
         rescue OCSPResponseFetch::Error::RevokedError
           warn 'error: end entity certificate is revoked'
@@ -24,19 +24,26 @@ module OCSPResponseFetch
         end
 
         warn ocsp_response.to_text if opts[:verbose]
-        puts ocsp_response.to_der
+        if opts[:output].nil?
+          puts ocsp_response.to_der
+        else
+          File.write(opts[:output], ocsp_response.to_der)
+        end
       end
 
       private
 
       # rubocop: disable Metrics/AbcSize
+      # rubocop: disable Metrics/CyclomaticComplexity
       # rubocop: disable Metrics/MethodLength
+      # rubocop: disable Metrics/PerceivedComplexity
       def parse_options(argv = ARGV)
         op = OptionParser.new
 
         # default value
         opts = {
           issuer: nil,
+          output: nil,
           strict: false,
           verbose: false
         }
@@ -47,6 +54,14 @@ module OCSPResponseFetch
           'issuer certificate path'
         ) do |v|
           opts[:issuer] = v
+        end
+
+        op.on(
+          '-o PATH',
+          '--output PATH',
+          'output file path'
+        ) do |v|
+          opts[:output] = v
         end
 
         op.on(
@@ -90,10 +105,21 @@ module OCSPResponseFetch
           exit 1
         end
 
+        unless opts[:output].nil?
+          begin
+            FileUtils.touch(opts[:output])
+          rescue Errno::EACCES
+            warn "error file #{opts[:output]} is not writable"
+            exit 1
+          end
+        end
+
         [args[0], opts]
       end
       # rubocop: enable Metrics/AbcSize
+      # rubocop: enable Metrics/CyclomaticComplexity
       # rubocop: enable Metrics/MethodLength
+      # rubocop: enable Metrics/PerceivedComplexity
 
       # @param subject [String]
       # @param issuer [String]
@@ -114,15 +140,16 @@ module OCSPResponseFetch
 
           begin
             issuer_cert = get_issuer_cert(ca_issuer)
-          rescue OpenSSL::X509::CertificateError, Net::OpenTimeout
-            raise OCSPResponseFetch::Error::FetchFailedEreror,
+          rescue OpenSSL::X509::CertificateError,
+                 Net::OpenTimeout, SystemCallError
+            raise OCSPResponseFetch::Error::FetchFailedError,
                   'Failed to get the issuser Certificate'
           end
         else
           begin
             issuer_cert = OpenSSL::X509::Certificate.new(File.read(issuer))
           rescue OpenSSL::X509::CertificateError
-            raise OCSPResponseFetch::Error::FetchFailedEreror,
+            raise OCSPResponseFetch::Error::FetchFailedError,
                   'Failed to get the issuser Certificate'
           end
         end

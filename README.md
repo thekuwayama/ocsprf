@@ -4,7 +4,7 @@
 [![Actions Status](https://github.com/thekuwayama/ocsprf/workflows/CI/badge.svg)](https://github.com/thekuwayama/ocsprf/actions?workflow=CI)
 [![Maintainability](https://api.codeclimate.com/v1/badges/4d5bb71e2dca46f5a239/maintainability)](https://codeclimate.com/github/thekuwayama/ocsprf/maintainability)
 
-OCSP Response Fetch
+`ocsprf` is OCSP Response Fetch CLI.
 
 
 ## Installation
@@ -22,6 +22,7 @@ $ gem install ocsprf
 $ ocsprf --help
 Usage: ocsprf [options] PATH
     -i, --issuer PATH                issuer certificate path
+    -o, --output PATH                output file path
     -s, --strict                     strict mode                   (default false)
     -v, --verbose                    verbose mode                  (default false)
 ```
