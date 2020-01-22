@@ -44,7 +44,7 @@ module OCSPResponseFetch
           Timeout.timeout(2) do
             ocsp_response = send_ocsp_request(ocsp_request, ocsp_uri)
           end
-        rescue Timeout::Error
+        rescue Timeout::Error, SystemCallError
           raise OCSPResponseFetch::Error::FetchFailedError,
                 'Timeout to access OCSP Responder'
         end

@@ -9,10 +9,10 @@ module OCSPResponseFetch
       def run
         subject, opts = parse_options
         issuer = opts[:issuer]
-        subject_cert, issuer_cert = read_certs(subject, issuer)
-
-        fetcher = Fetcher.new(subject_cert, issuer_cert)
+        ocsp_response = nil
         begin
+          subject_cert, issuer_cert = read_certs(subject, issuer)
+          fetcher = Fetcher.new(subject_cert, issuer_cert)
           ocsp_response = fetcher.run
         rescue OCSPResponseFetch::Error::RevokedError
           warn 'error: end entity certificate is revoked'
@@ -112,11 +112,6 @@ module OCSPResponseFetch
             warn "error file #{opts[:output]} is not writable"
             exit 1
           end
-
-          unless File.writable?(opts[:output])
-            warn "error file #{opts[:output]} is not writable"
-            exit 1
-          end
         end
 
         [args[0], opts]
@@ -145,15 +140,16 @@ module OCSPResponseFetch
 
           begin
             issuer_cert = get_issuer_cert(ca_issuer)
-          rescue OpenSSL::X509::CertificateError, Net::OpenTimeout
-            raise OCSPResponseFetch::Error::FetchFailedEreror,
+          rescue OpenSSL::X509::CertificateError,
+                 Net::OpenTimeout, SystemCallError
+            raise OCSPResponseFetch::Error::FetchFailedError,
                   'Failed to get the issuser Certificate'
           end
         else
           begin
             issuer_cert = OpenSSL::X509::Certificate.new(File.read(issuer))
           rescue OpenSSL::X509::CertificateError
-            raise OCSPResponseFetch::Error::FetchFailedEreror,
+            raise OCSPResponseFetch::Error::FetchFailedError,
                   'Failed to get the issuser Certificate'
           end
         end
