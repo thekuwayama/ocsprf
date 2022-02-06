@@ -6,6 +6,8 @@
 
 `ocsprf` is OCSP Response Fetch CLI.
 
+- https://datatracker.ietf.org/doc/html/rfc6960
+
 
 ## Installation
 
